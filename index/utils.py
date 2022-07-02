@@ -1,3 +1,5 @@
+import re
+
 # preprocess methods
 def punctuation_removal(s):
   return re.sub(r'[^\w\s]', '', s)

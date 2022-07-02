@@ -1,9 +1,8 @@
-import gensim, re
-from gensim.test.utils import common_texts
-from gensim.models.doc2vec import Doc2Vec, TaggedDocument
-from sklearn.feature_extraction.text import TfidfVectorizer
+import gensim
 import numpy as np
 from utils import *
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 class VSMIndex:
   def __init__(self, method, dataset):
@@ -20,7 +19,7 @@ class VSMIndex:
   
   def gen_doc2vec(self, vector_size=40, min_count=2, epochs=30):
     documents = [TaggedDocument(doc, [i]) for i, doc in enumerate(self.contexts)]
-    self.model = gensim.models.doc2vec.Doc2Vec(documents, vector_size=vector_size, min_count=min_count, epochs=epochs)
+    self.model = Doc2Vec(documents, vector_size=vector_size, min_count=min_count, epochs=epochs)
     
     # use trained doc2vec to represent docs
     self.doc_vecs = np.zeros((len(self.contexts), vector_size))
