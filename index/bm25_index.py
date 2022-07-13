@@ -1,6 +1,6 @@
 import datasets
 import numpy as np
-from utils import *
+from index.utils import preprocess, punctuation_removal
 from datasets import load_dataset
 
 class BM25Index:
