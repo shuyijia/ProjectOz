@@ -14,23 +14,15 @@ class BM25:
     def score_doc(self, query, doc, k1, b):
         score = 0.0
         
-        tf = {}
-        df = {}
-
         for term in query:
-            if term not in self.index:
+            if doc not in self.index.get(term, {}):
                 continue
-            elif doc in self.index[term]:
-                tf[term] = tf.get(term, self.index[term][doc])
-                df[term] = df.get(term,len(self.index[term]))
-            
-        for term in query:
-            if term not in tf.keys():
-                continue 
-            
-            log_term = math.log(len(self.docs)/df[term])
-            numerator = (k1+1) * tf[term]
-            denominator = k1 * ((1-b) +b * (len(self.docs[doc])/self.average_doc_len)) + tf[term]
+            tf_term = self.index[term][doc]
+            df_term = len(self.index[term])
+
+            log_term = math.log(len(self.docs)/df_term)
+            numerator = (k1+1) * tf_term
+            denominator = k1 * ((1-b) +b * (len(self.docs[doc])/self.average_doc_len)) + tf_term
             score += log_term * (numerator/denominator)
         return score
     
