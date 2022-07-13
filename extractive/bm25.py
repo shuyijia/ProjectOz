@@ -13,7 +13,7 @@ class BM25:
         
     def score_doc(self, query, doc, k1, b):
         score = 0.0
-        query = query.split()
+        
         tf = {}
         df = {}
 
@@ -35,6 +35,7 @@ class BM25:
         return score
     
     def score_docs(self, query, k1=1.5, b=0.75, print_top_k=0):
+        query = [term.lower() for term in query.split()]
         bm25_scores = {}
         for doc_id in tqdm(range(len(self.docs))):
             bm25_scores[doc_id] = bm25.score_doc(query,doc_id, k1, b)
@@ -54,6 +55,6 @@ if __name__ == "__main__":
     valid = dataset['validation']
     bm25_index = BM25Index(valid)
     bm25 = BM25(bm25_index)
-    query = "hello how are you"
+    query = "Syria"
     bm25_scores = bm25.score_docs(query, print_top_k=5)
     
