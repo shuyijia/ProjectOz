@@ -3,6 +3,7 @@ import numpy as np
 from utils import *
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import TruncatedSVD
 
 
 class VSMIndex:
@@ -15,7 +16,7 @@ class VSMIndex:
         if self.method == 'doc2vec':
             self.gen_doc2vec(vector_size=vector_size)
         elif self.method == 'tfidf':
-            self.gen_tfidf()
+            self.gen_tfidf(vector_size=vector_size)
         else:
             raise ValueError('Unsppported method type.')
 
@@ -28,7 +29,7 @@ class VSMIndex:
         for i, doc in enumerate(self.contexts):
             self.doc_vecs[i, :] = self.model.infer_vector(doc)
 
-    def gen_tfidf(self, max_features=500):
+    def gen_tfidf(self, vector_size=40, max_features=500):
         documents = [' '.join(doc) for doc in self.contexts]
         self.model = TfidfVectorizer(max_features=max_features)
         self.X = self.model.fit_transform(documents)
@@ -37,15 +38,19 @@ class VSMIndex:
         for i, doc in enumerate(documents):
             self.doc_vecs[i, :] = self.model.transform([doc]).todense()
 
+        self.svd = TruncatedSVD(n_components=vector_size, n_iter=7, random_state=42)
+        self.doc_vecs = self.svd.fit_transform(self.doc_vecs)
+
     def infer(self, doc):
         '''
-        doc: list of words
+        doc: str
         '''
         if self.method == 'doc2vec':
-            return self.model.infer_vector(doc)
+            doc = doc.split(' ')
+            return self.model.infer_vector(doc, steps=20, alpha=0.025)
         elif self.method == 'tfidf':
-            return self.model.transform(' '.join(doc))
-
+            sparse = self.model.transform([doc])
+            return self.svd.transform(sparse)
 
 if __name__ == '__main__':
     datasets = load_dataset("squad_v2")
