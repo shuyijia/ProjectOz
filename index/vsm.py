@@ -57,13 +57,12 @@ if __name__ == '__main__':
     valid = datasets['validation']
 
     method = 'doc2vec'
-
     idx = VSMIndex(method, valid)
 
     # get all vectorzied documents
     all_docs = idx.doc_vecs
 
     # convert a query to vectorized form
-    query = 'what is the name of the last French king'.split(' ')
+    query = 'what is the name of the last French king'
     vectorized_query = idx.infer(query)
     print(vectorized_query.shape)
