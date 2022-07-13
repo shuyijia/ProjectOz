@@ -1,5 +1,4 @@
 from datasets import load_dataset
-import datasets
 from index.bm25_index import BM25Index
 from tqdm import tqdm
 import math

@@ -1,4 +1,3 @@
-import datasets
 import numpy as np
 from index.utils import preprocess, punctuation_removal
 from datasets import load_dataset
