@@ -1,6 +1,6 @@
 from datasets import load_dataset
 import numpy as np
-from utils import *
+from index.utils import *
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
@@ -56,11 +56,14 @@ if __name__ == '__main__':
     datasets = load_dataset("squad_v2")
     valid = datasets['validation']
 
-    method = 'doc2vec'
+    method = 'tfidf'
     idx = VSMIndex(method, valid)
 
     # get all vectorzied documents
     all_docs = idx.doc_vecs
+    print(type(all_docs))
+    print(all_docs.shape)
+    print(all_docs)
 
     # convert a query to vectorized form
     query = 'what is the name of the last French king'
