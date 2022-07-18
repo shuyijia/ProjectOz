@@ -3,6 +3,9 @@ from tqdm import tqdm
 import math
 import numpy as np
 
+from helpers.utils import preprocess
+from query_expansion.expand_query import get_expanded_query
+
 
 class BM25:
     def __init__(self, bm25_index):
@@ -25,8 +28,11 @@ class BM25:
             score += log_term * (numerator/denominator)
         return score
     
-    def score_docs(self, query, k1=1.5, b=0.75, print_top_k=0):
-        query = [term.lower() for term in query.split()]
+    def score_docs(self, query, k1=1.5, b=0.75, print_top_k=0, expand_query=True):
+        if expand_query:
+            query = get_expanded_query(query)
+        print("THE QUERY IS", query)
+        query = preprocess([query])[0]
         bm25_scores = {}
         for doc_id in tqdm(range(len(self.docs))):
             bm25_scores[doc_id] = self.score_doc(query,doc_id, k1, b)

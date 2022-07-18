@@ -1,33 +1,7 @@
 import nltk
 from nltk.corpus import wordnet as wn
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from constants import POS_TAG_MAP
+from query_expansion.constants import POS_TAG_MAP
 import re
-
-def download_nltk_packages():
-    nltk.download('wordnet')
-    nltk.download('punkt')
-    nltk.download('stopwords')
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('omw-1.4')
-    
-download_nltk_packages()
-
-
-def tokenizer(sentence):
-    return word_tokenize(sentence)
-
-def pos_tagger(tokens):
-    return nltk.pos_tag(tokens)
-
-def stopword_treatment(tokens):
-    stopword = stopwords.words('english')
-    result = []
-    for token in tokens:
-        if token[0].lower() not in stopword:
-            result.append(tuple([token[0].lower(), token[1]]))
-    return result
 
 def pos_tag_converter(pos_tag_map, nltk_pos_tag):
     root_tag = nltk_pos_tag[0:2]
@@ -83,20 +57,3 @@ def underscore_replacer(tokens):
         mod_key = re.sub(r'_', ' ', key)
         new_tokens[mod_key] = tokens[key]
     return new_tokens
-
-
-def generate_tokens(sentence):
-    tokens = tokenizer(sentence)
-    tokens = pos_tagger(tokens)
-    tokens = stopword_treatment(tokens)
-    synsets = get_synsets(tokens)
-    synonyms = get_tokens_from_synsets(synsets)
-    synonyms = underscore_replacer(synonyms)
-    hypernyms = get_hypernyms(synsets)
-    hypernyms = get_tokens_from_hypernyms(hypernyms)
-    hypernyms = underscore_replacer(hypernyms)
-    tokens = {**synonyms, **hypernyms}
-    return tokens
-
-print(generate_tokens('Silenced by the chaos.'))
-# print(wn.synsets('run'))
