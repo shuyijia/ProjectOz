@@ -1,6 +1,6 @@
 from datasets import load_dataset
 import numpy as np
-from index.utils import *
+from helpers.utils import *
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD

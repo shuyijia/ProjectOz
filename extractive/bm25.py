@@ -1,5 +1,4 @@
 from datasets import load_dataset
-from index.bm25_index import BM25Index
 from tqdm import tqdm
 import math
 import numpy as np
@@ -30,23 +29,15 @@ class BM25:
         query = [term.lower() for term in query.split()]
         bm25_scores = {}
         for doc_id in tqdm(range(len(self.docs))):
-            bm25_scores[doc_id] = bm25.score_doc(query,doc_id, k1, b)
+            bm25_scores[doc_id] = self.score_doc(query,doc_id, k1, b)
         bm25_scores_sorted =  dict(sorted(bm25_scores.items(), key=lambda item: item[1], reverse=True))
 
         print_doc_count = 0
         for doc_id in bm25_scores_sorted:
             if print_doc_count == print_top_k:
                 break
-            print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {bm25_scores_sorted[doc_id]} \n\nWords in Doc {doc_id}: {self.docs[doc_id]}", end=f"\n\n{'*'*175}\n\n")
+            print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {bm25_scores_sorted[doc_id]} \n\nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])}", end=f"\n\n{'*'*175}\n\n")
             print_doc_count += 1
         return bm25_scores_sorted
             
-if __name__ == "__main__":
-    
-    dataset = load_dataset("squad_v2")
-    valid = dataset['validation']
-    bm25_index = BM25Index(valid)
-    bm25 = BM25(bm25_index)
-    query = "Syria"
-    bm25_scores = bm25.score_docs(query, print_top_k=5)
     
