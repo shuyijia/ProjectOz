@@ -20,7 +20,7 @@ class VSM:
 
     def vsm(self, query, vsm_method = "cosine_similarity", print_top_k=0):
         self.vectorized_query = self.vsm_index.infer(query)
-        
+        factor = 5
         self.vsm_method = vsm_method
         doc_index = 0
 
