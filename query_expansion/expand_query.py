@@ -24,6 +24,6 @@ def generate_tokens(sentence):
     tokens = {**synonyms, **hypernyms}
     return tokens
 
-def get_expanded_query(query):
-    query_tokens=generate_tokens(query)
-    return f"{query} {' '.join(list(query_tokens.keys()))}"
+def get_expanded_query(query, expand_terms):
+    query_tokens=generate_tokens(" ".join(expand_terms))
+    return f"{' '.join(query)} {' '.join(list(query_tokens.keys()))}"

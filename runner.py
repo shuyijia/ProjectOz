@@ -9,4 +9,4 @@ if __name__ == "__main__":
     bm25_index = BM25Index(valid)
     bm25 = BM25(bm25_index)
     query = "In what country is Normandy located"
-    bm25_scores = bm25.score_docs(query, print_top_k=10)
+    bm25_scores = bm25.score_docs(query, print_top_k=10, expand_query=True)
