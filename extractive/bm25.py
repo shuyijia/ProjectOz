@@ -33,12 +33,12 @@ class BM25:
             score += idf_term * (numerator/denominator)
         return score
     
-    def expand_query_idf(self, query):
+    def expand_query_idf(self, query, top_k=2):
         idf_query_terms = {}
         for term in query:
             idf_query_terms[term] = (self.get_idf(self.get_df(term)))
         idf_query_terms = dict(sorted(idf_query_terms.items(), key=lambda item: item[1], reverse=True))
-        return get_expanded_query(query, list(idf_query_terms.keys())[:2])
+        return get_expanded_query(query, list(idf_query_terms.keys())[:top_k])
     
     def score_docs(self, query, k1=1.5, b=0.75, print_top_k=0, expand_query=True):
         query = preprocess([query])[0]
