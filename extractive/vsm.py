@@ -54,7 +54,7 @@ class VSM:
         for doc_id in vsm_scores_sorted:
             if print_doc_count == print_top_k:
                 break
-            print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {vsm_scores_sorted[doc_id]} \nWords in Doc {doc_id}: {self.docs[doc_id]}", end=f"\n\n{'*'*175}\n")
+            print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {vsm_scores_sorted[doc_id]} \nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])}", end=f"\n\n{'*'*175}\n")
             print_doc_count += 1
         print("\n"*5)
         return vsm_scores_sorted
