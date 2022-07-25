@@ -44,8 +44,8 @@ class BM25:
         query = preprocess([query])[0]
         if expand_query:
             query = self.expand_query_idf(query)
+            query = preprocess([query])[0]
         print("Final query:",query)
-        query = preprocess([query])[0]
         bm25_scores = {}
         for doc_id in tqdm(range(len(self.docs))):
             bm25_scores[doc_id] = self.score_doc(query,doc_id, k1, b)
