@@ -27,3 +27,14 @@ if __name__ == "__main__":
     # vsm = VSM(vsm_index)
     # # vsm.vsm(query, vsm_method="cosine_similarity", print_top_k=3)
     # vsm.vsm(query, vsm_method="jaccard_similarity", print_top_k=3)
+
+    method = 'tfidf'
+    vsm_index = VSMIndex(method, valid)
+
+    # convert a query to vectorized form
+    query = 'what is phonology'
+    vectorized_query = vsm_index.infer(query)
+
+    vsm = VSM(vsm_index)
+    vsm.vsm(query, vsm_method="cosine_similarity", print_top_k=10)
+    # vsm.vsm(query, vsm_method="jaccard_similarity", print_top_k=10)
