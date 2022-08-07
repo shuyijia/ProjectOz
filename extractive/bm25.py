@@ -55,6 +55,6 @@ class BM25:
                 break
             print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {bm25_scores_sorted[doc_id]} \n\nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])}", end=f"\n\n{'*'*175}\n\n")
             print_doc_count += 1
-        return bm25_scores_sorted
+        return bm25_scores_sorted 
             
     
