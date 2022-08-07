@@ -1,8 +1,6 @@
-from datasets import load_dataset
 from tqdm import tqdm
 import math
 import numpy as np
-
 from helpers.utils import preprocess
 from query_expansion.expand_query import get_expanded_query
 
