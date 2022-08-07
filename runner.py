@@ -12,7 +12,7 @@ if __name__ == "__main__":
     bm25_index = BM25Index(valid)
     bm25 = BM25(bm25_index)
     query = "In what country is Normandy located"
-    bm25_scores = bm25.score_docs(query, print_top_k=1, expand_query=False)
+    bm25_scores, doc_contexts = bm25.score_docs(query, top_k=1, expand_query=False)
     # print(bm25_scores)
     # VSM
     # dataset = load_dataset("squad_v2")
