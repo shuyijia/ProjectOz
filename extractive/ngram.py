@@ -104,19 +104,24 @@ class Ngram:
         else:
             raise ValueError
         return s_prob
-
+    
+    def rank_docs(self, query, contexts):
+        query_parsed = self.query_ngrams(query, 2)
+        prob_dict = {}
+        for id, context in enumerate(contexts):
+            unigram_set, unigram_dict = self.compute_ngram([context], 1)
+            bigram_set, bigram_dict = self.compute_ngram(context, 2)
+            trigram_set, trigram_dict = self.compute_ngram(context, 3)
+            num_words = sum([v for _,v in unigram_dict.items()])
+            prob = 1
+            for ngram in query_parsed:
+                print(ngram, unigram_dict)
+                prob *= self.ngram_prob(ngram, num_words,unigram_dict, bigram_dict, trigram_dict)
+            prob_dict[id] = prob
+        prob_dict_sorted = dict(sorted(prob_dict.items(), key=lambda item: item[1], reverse=True))
+        return prob_dict_sorted
 
 if __name__ == "__main__":
 
     ngram = Ngram()
-    # print(ngram.compute_ngram([["hi", "hello","how", "are", "you", "today"], ["hi","how", "are", "you", "tomorrow"]], 2))
-    unigram_set, unigram_dict = ngram.compute_ngram([["hi", "hello","how", "are", "you", "today"], ["hi","how", "are", "you", "tomorrow"]], 1)
-    bigram_set, bigram_dict = ngram.compute_ngram([["hi", "hello","how", "are", "you", "today"],["hi","how", "are", "you", "tomorrow"]], 2)
-    print(unigram_dict)
-    print(bigram_dict)
-    trigram_set, trigram_dict = ngram.compute_ngram([["hi", "hello","how", "are", "you", "today"], ["hi","how", "are", "you", "tomorrow"]], 3)
-    num_words = sum([v for _,v in unigram_dict.items()])
-    ngrams = ngram.query_ngrams("hi how are you", 2)
-    print(ngrams)
-    prob = ngram.ngram_prob(ngrams[2], num_words,unigram_dict, bigram_dict, trigram_dict)
-    print(prob)
+    print(ngram.rank_docs("hi how are you", [["hi", "how", "is", "this","you", "are"], ["how", "are", "you", "hi"], ["hi", "how", "are", "you"], ["hello", "how", "are", "you", "hi"]]))
