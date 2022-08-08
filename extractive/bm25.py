@@ -44,15 +44,11 @@ class BM25:
             query = self.expand_query_idf(query)
             query = preprocess([query])[0]
         print("Final query:",query)
-        doc_count = 0
         bm25_scores = {}
         for doc_id in tqdm(range(len(self.docs))):
-            if doc_count == top_k:
-                break
             bm25_scores[doc_id] = self.score_doc(query,doc_id, k1, b)
-            doc_count += 1
         bm25_scores_sorted =  dict(sorted(bm25_scores.items(), key=lambda item: item[1], reverse=True))
-
+        bm25_scores_sorted = dict(list(bm25_scores_sorted.items())[: top_k])
         print_doc_count = 0
         doc_contexts = []
         for doc_id in bm25_scores_sorted:
