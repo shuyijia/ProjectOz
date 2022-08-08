@@ -1,8 +1,6 @@
-from datasets import load_dataset
 from tqdm import tqdm
 import math
 import numpy as np
-
 from helpers.utils import preprocess
 from query_expansion.expand_query import get_expanded_query
 
@@ -40,23 +38,29 @@ class BM25:
         idf_query_terms = dict(sorted(idf_query_terms.items(), key=lambda item: item[1], reverse=True))
         return get_expanded_query(query, list(idf_query_terms.keys())[:top_k])
     
-    def score_docs(self, query, k1=1.5, b=0.75, print_top_k=0, expand_query=True):
+    def score_docs(self, query, k1=1.5, b=0.75, top_k=0, expand_query=True):
         query = preprocess([query])[0]
         if expand_query:
             query = self.expand_query_idf(query)
             query = preprocess([query])[0]
         print("Final query:",query)
+        doc_count = 0
         bm25_scores = {}
         for doc_id in tqdm(range(len(self.docs))):
+            if doc_count == top_k:
+                break
             bm25_scores[doc_id] = self.score_doc(query,doc_id, k1, b)
+            doc_count += 1
         bm25_scores_sorted =  dict(sorted(bm25_scores.items(), key=lambda item: item[1], reverse=True))
 
         print_doc_count = 0
+        doc_contexts = []
         for doc_id in bm25_scores_sorted:
-            if print_doc_count == print_top_k:
+            if print_doc_count == top_k:
                 break
             print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {bm25_scores_sorted[doc_id]} \n\nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])}", end=f"\n\n{'*'*175}\n\n")
+            doc_contexts.append(' '.join(self.docs[doc_id]))
             print_doc_count += 1
-        return bm25_scores_sorted
+        return bm25_scores_sorted, doc_contexts
             
     
