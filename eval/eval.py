@@ -8,6 +8,7 @@ from prettyprinter import pprint
 from extractive.vsm import VSM
 from helpers.utils import *
 import time
+from tqdm import tqdm
 
 class Eval():
     def __init__(self, dataset, processed_context, vsm=None, bm25=None, language_model=None):
@@ -25,7 +26,7 @@ class Eval():
                 val => query
         '''
         ranks = []
-        for i, each in enumerate(self.dataset):
+        for i, each in tqdm(enumerate(self.dataset)):
             q = each['question']
             doc = each['context']
             doc_id = self.processed_context.index(preprocess([doc])[0])
@@ -36,8 +37,6 @@ class Eval():
             elif self.language_model:
                 tagged_sorted_dict, _ = self.language_model.score_docs(self, q, k=k, alpha=alpha, top_k = top_k, expand_query=expand_query, verbose=verbose)
             ranks.append(list(tagged_sorted_dict.keys()).index(doc_id))
-            if i % 100 == 0:
-                print(i)
         print("Done", np.mean(ranks))
         return np.mean(ranks)
 
