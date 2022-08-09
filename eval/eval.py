@@ -8,32 +8,37 @@ from prettyprinter import pprint
 from extractive.vsm import VSM
 from helpers.utils import *
 import time
+from tqdm import tqdm
 
 class Eval():
-    def __init__(self, dataset, processed_context, vsm):
+    def __init__(self, dataset, processed_context, vsm=None, bm25=None, language_model=None):
         self.dataset = dataset
         self.processed_context = processed_context
         # self.index_alignment()
         self.vsm = vsm
-        self.average_rank()
+        self.bm25 = bm25
+        self.language_model = language_model
+        # self.average_rank()
 
-    def average_rank(self):
+    def average_rank(self, vsm_method=None, top_k=None, expand_query=None, verbose=None, k=None, alpha=None):
         '''
         out:    key => doc_id
                 val => query
         '''
         ranks = []
-        for i, each in enumerate(self.dataset):
+        for i, each in tqdm(enumerate(self.dataset)):
             q = each['question']
             doc = each['context']
             doc_id = self.processed_context.index(preprocess([doc])[0])
-            tic = time.time()
-            allvsm, tagged_sorted_dict = self.vsm.vsm(q, vsm_method = "jaccard_similarity", print_top_k=10)
-            toc = time.time()
-            print((toc-tic) /1000)
+
+            if self.vsm:
+                _, tagged_sorted_dict = self.vsm.vsm(q, vsm_method = vsm_method, print_top_k=top_k)
+            elif self.bm25:
+                tagged_sorted_dict, _ = self.bm25.score_docs(q, top_k=top_k, expand_query=expand_query, verbose=verbose)
+            elif self.language_model:
+                tagged_sorted_dict, _ = self.language_model.score_docs(self, q, k=k, alpha=alpha, top_k = top_k, expand_query=expand_query, verbose=verbose)
+
             ranks.append(list(tagged_sorted_dict.keys()).index(doc_id))
-            if i % 100 == 0:
-                print(i)
         print("Done", np.mean(ranks))
         return np.mean(ranks)
 

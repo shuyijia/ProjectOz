@@ -50,7 +50,8 @@ class VSMIndex:
         '''
         if self.method == 'doc2vec':
             doc = doc.split(' ')
-            return self.model.infer_vector(doc, steps=20, alpha=0.025)
+            out = self.model.infer_vector(doc, epochs=20, alpha=0.025)
+            return np.expand_dims(out, axis=0)
         elif self.method == 'tfidf':
             sparse = self.model.transform([doc])
             return self.svd.transform(sparse)
@@ -59,7 +60,7 @@ if __name__ == '__main__':
     datasets = load_dataset("squad_v2")
     valid = datasets['validation']
 
-    method = 'tfidf'
+    method = 'word2vec'
     idx = VSMIndex(method, valid)
 
     # get all vectorzied documents

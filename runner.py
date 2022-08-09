@@ -16,6 +16,10 @@ if __name__ == "__main__":
     # valid = dataset['train']
     # bm25_index = BM25Index(valid)
     # bm25 = BM25(bm25_index)
+    dataset = load_dataset("squad_v2")
+    valid = dataset['validation']
+    bm25_index = BM25Index(valid)
+    bm25 = BM25(bm25_index)
     # query = "In what country is Normandy located"
     # bm25_scores, doc_contexts = bm25.score_docs(query, top_k=3, expand_query=False)
     # print(bm25_scores)
@@ -30,23 +34,17 @@ if __name__ == "__main__":
     # print(bm25_scores)
 
     # VSM
-    dataset = load_dataset("squad_v2")
-    valid = dataset['validation']
-    method = 'tfidf'
-    vsm_index = VSMIndex(method, valid)
-
-    # convert a query to vectorized form
-    query = 'Who did the Irish culture have a profound effect on?'
-    print("Query: ", query, '\n')
-    vectorized_query = vsm_index.infer(query)
-
-    vsm = VSM(vsm_index)
+    # dataset = load_dataset("squad_v2")
+    # valid = dataset['validation']
+    # method = 'doc2vec'
+    # vsm_index = VSMIndex(method, valid)
+    # vsm = VSM(vsm_index)
     # allvsm, tagged_sorted_dict = vsm.vsm(query, vsm_method="cosine_similarity", print_top_k=3)
     # vsm.vsm(query, vsm_method="jaccard_similarity", print_top_k=3)
     # pprint(tagged_sorted_dict)
 
-    eval = Eval(valid, vsm_index.contexts, vsm)
-
+    eval = Eval(valid, bm25_index.contexts, bm25=bm25)
+    print(eval.average_rank(top_k=len(bm25_index.contexts), expand_query=True, verbose=False))
     
     # method = 'tfidf'
     # vsm_index = VSMIndex(method, valid)
@@ -75,7 +73,9 @@ if __name__ == "__main__":
     # valid = dataset['train']
     # bm25_index = BM25Index(valid)
     # ngram = Ngram(bm25_index)
+
     # ngram_scores, ngram_contexts = ngram.rank_docs("duck you when", 3, alpha=None, top_k=10, expand_query=True, verbose=False)
+
 
     # main idea: Get the top K docs, fetch the docs's query tagging
     # if tagging exist for the doc then yes

@@ -139,7 +139,7 @@ class Ngram:
             raise ValueError
         return s_prob
     
-    def rank_docs(self, query, k, alpha=None, top_k = 0, expand_query=False, verbose=False):
+    def score_docs(self, query, k, alpha=None, top_k = 0, expand_query=False, verbose=False):
         query_parsed = self.query_ngrams(query, k, expand_query=expand_query)
         prob_dict = {}
         for id, context in enumerate(self.docs):
