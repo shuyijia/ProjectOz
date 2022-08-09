@@ -2,6 +2,7 @@ from collections import Counter
 import itertools
 import numpy as np
 import math
+from datasets import load_dataset
 
 # used for unseen words in training vocabularies
 UNK = None
@@ -110,18 +111,14 @@ class Ngram:
         prob_dict = {}
         for id, context in enumerate(contexts):
             unigram_set, unigram_dict = self.compute_ngram([context], 1)
-            bigram_set, bigram_dict = self.compute_ngram(context, 2)
-            trigram_set, trigram_dict = self.compute_ngram(context, 3)
+            bigram_set, bigram_dict = self.compute_ngram([context], 2)
+            trigram_set, trigram_dict = self.compute_ngram([context], 3)
             num_words = sum([v for _,v in unigram_dict.items()])
             prob = 1
             for ngram in query_parsed:
-                print(ngram, unigram_dict)
+                # print(ngram, bigram_dict)
                 prob *= self.ngram_prob(ngram, num_words,unigram_dict, bigram_dict, trigram_dict)
             prob_dict[id] = prob
         prob_dict_sorted = dict(sorted(prob_dict.items(), key=lambda item: item[1], reverse=True))
         return prob_dict_sorted
 
-if __name__ == "__main__":
-
-    ngram = Ngram()
-    print(ngram.rank_docs("hi how are you", [["hi", "how", "is", "this","you", "are"], ["how", "are", "you", "hi"], ["hi", "how", "are", "you"], ["hello", "how", "are", "you", "hi"]]))
