@@ -26,14 +26,16 @@ class VSM:
         self.vsm_method = vsm_method
         doc_index = 0
 
-        print("Original Context: ", self.original_context[0])
-        print("Context: ", self.docs[0])
-        for i in range(5):
-            print(self.original_context[i])
-            print(self.questions[i])
+        # print("Original Context: ", self.original_context[0])
+        # print("Context: ", ' '.join(self.docs[0]))
+        # for i in range(5):
+        #     print("Original Context: ", self.original_context[i], "\n")
+        #     print("Context: ", ' '.join(self.docs[0]), '/n')
+        #     print("Questions: ", self.questions[i], '/n')
 
 
         self.tagged_questions = {}
+        
 
         if vsm_method == "cosine_similarity":
             all_vsm = {}
@@ -43,7 +45,7 @@ class VSM:
                 all_vsm[doc_index] = cosine_similarity(a, b)[0][0]
                 doc_index += 1
             vsm_scores_sorted = self.score_docs(all_vsm, print_top_k)
-            return all_vsm
+            return all_vsm, self.tagged_sorted_dict
         elif vsm_method == "jaccard_similarity":
             all_vsm = {}
             self.tagged_questions = {}
@@ -55,10 +57,10 @@ class VSM:
                 j_score = jaccard_score(a, b, average="micro")
                 all_vsm[doc] = j_score
                 self.tagged_questions[doc] = self.questions[doc]
-                self.tagged_answers[doc] = self.original_context[doc] 
+                self.tagged_answers[doc] = self.original_context[doc]
 
             vsm_scores_sorted = self.score_docs(all_vsm, print_top_k)
-            return all_vsm
+            return all_vsm, self.tagged_sorted_dict
         else:
             print("Method doesn't exist!")
             return None
@@ -67,13 +69,17 @@ class VSM:
 
         vsm_scores_sorted =  dict(sorted(all_vsm.items(), key=lambda item: item[1], reverse=True))
         print_doc_count = 0
-        print("VSM Method: ", self.vsm_method)
+        self.tagged_sorted_dict = {}
+
+        #print("VSM Method: ", self.vsm_method)
         for doc_id in vsm_scores_sorted:
-            if print_doc_count == print_top_k:
-                break
-            print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {vsm_scores_sorted[doc_id]} \nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])} \n\n {self.tagged_answers[doc_id]} \n Questions: {self.questions[doc_id]}", end=f"\n\n{'*'*175}\n")
+            # if print_doc_count == print_top_k:
+            #     break
+            # print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {vsm_scores_sorted[doc_id]} \nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])} \n", end=f"\n\n{'*'*175}\n")
+            self.tagged_sorted_dict[doc_id] = ' '.join(self.docs[doc_id])
+
             print_doc_count += 1
-        print("\n"*5)
+        #print("\n"*5)
         return vsm_scores_sorted
 
 if __name__ == "__main__":

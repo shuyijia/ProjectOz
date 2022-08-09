@@ -7,6 +7,7 @@ from helpers.utils import preprocess, punctuation_removal
 from extractive.ngram import Ngram
 from eval.eval import Eval
 from ordered_set import OrderedSet
+from prettyprinter import pprint
 
 if __name__ == "__main__":
     
@@ -29,19 +30,24 @@ if __name__ == "__main__":
     # print(bm25_scores)
 
     # VSM
-    # dataset = load_dataset("squad_v2")
-    # valid = dataset['validation']
-    # method = 'tfidf'
-    # vsm_index = VSMIndex(method, valid)
+    dataset = load_dataset("squad_v2")
+    valid = dataset['validation']
+    method = 'tfidf'
+    vsm_index = VSMIndex(method, valid)
 
-    # # convert a query to vectorized form
-    # query = 'Who did the Irish culture have a profound effect on?'
-    # vectorized_query = vsm_index.infer(query)
+    # convert a query to vectorized form
+    query = 'Who did the Irish culture have a profound effect on?'
+    print("Query: ", query, '\n')
+    vectorized_query = vsm_index.infer(query)
 
-    # vsm = VSM(vsm_index)
-    # # vsm.vsm(query, vsm_method="cosine_similarity", print_top_k=3)
+    vsm = VSM(vsm_index)
+    # allvsm, tagged_sorted_dict = vsm.vsm(query, vsm_method="cosine_similarity", print_top_k=3)
     # vsm.vsm(query, vsm_method="jaccard_similarity", print_top_k=3)
+    # pprint(tagged_sorted_dict)
 
+    eval = Eval(valid, vsm_index.contexts, vsm)
+
+    
     # method = 'tfidf'
     # vsm_index = VSMIndex(method, valid)
 
@@ -54,15 +60,15 @@ if __name__ == "__main__":
     # vsm.vsm(query, vsm_method="jaccard_similarity", print_top_k=10)
     
     # NGRAM
-    dataset = load_dataset("squad_v2")
-    valid = dataset['train']
-    data_preprocessed = preprocess(list(OrderedSet(valid['context'])))
+    # dataset = load_dataset("squad_v2")
+    # valid = dataset['train']
+    # data_preprocessed = preprocess(list(OrderedSet(valid['context'])))
     # print(len(data_preprocessed))
     # ngram = Ngram()
     # print(ngram.rank_docs("hi how are you", data_preprocessed))
-    print(valid)
-
+    
+    
     # main idea: Get the top K docs, fetch the docs's query tagging
     # if tagging exist for the doc then yes
-    eval = Eval()
-    eval.precision_at_top_k()
+    
+    

@@ -4,17 +4,80 @@ from helpers.utils import *
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
-class VSMIndex:
-    def __init__(self, method, dataset, vector_size=40):
-        self.method = method
-        self.dataset = dataset
-        self.vector_size = vector_size
-        self.contexts = preprocess(list(set(self.dataset['context'])))
-
-
-
+from prettyprinter import pprint
+from extractive.vsm import VSM
+from helpers.utils import *
+import time
 
 class Eval():
+    def __init__(self, dataset, processed_context, vsm):
+        self.dataset = dataset
+        self.processed_context = processed_context
+        # self.index_alignment()
+        self.vsm = vsm
+        self.average_rank()
+
+    def average_rank(self):
+        '''
+        out:    key => doc_id
+                val => query
+        '''
+        ranks = []
+        for i, each in enumerate(self.dataset):
+            q = each['question']
+            doc = each['context']
+            doc_id = self.processed_context.index(preprocess([doc])[0])
+            tic = time.time()
+            allvsm, tagged_sorted_dict = self.vsm.vsm(q, vsm_method = "cosine_similarity", print_top_k=10)
+            toc = time.time()
+            print((toc-tic) /1000)
+            ranks.append(list(tagged_sorted_dict.keys()).index(doc_id))
+            if i % 100 == 0:
+                print(i)
+        print("Done", np.mean(ranks))
+        return np.mean(ranks)
+
+
+    def index_alignment(self):
+        length_of_dataset = len(self.dataset['question'])
+        index = 0
+        self.questiions_id_dict = {}
+        self.questiions_id_dict[0] = [self.dataset['question'][0]]
+
+        for i in range(1, length_of_dataset): #300): #
+            if self.dataset['context'][i] == self.dataset['context'][i-1]:
+                if index not in self.questiions_id_dict:
+                    self.questiions_id_dict[index] = [self.dataset['question'][i]]
+                else:
+                    self.questiions_id_dict[index].append(self.dataset['question'][i])
+            else:
+                index += 1
+                if index not in self.questiions_id_dict:
+                    self.questiions_id_dict[index] = [self.dataset['question'][i]]
+                else:
+                    self.questiions_id_dict[index].append(self.dataset['question'][i])
+            
+            if i % 1000 == 0:
+                print("Eval: ", i)
+
+        # pprint(self.questiions_id_dict)
+        # self.check_questions_doc_tagging(337)
+        
+
+    def check_questions_doc_tagging(self, x):
+        print("Questions-Doc Index: ", x)
+        for i in range(len(self.questiions_id_dict[x])):
+            print("Question ", i,": ", self.questiions_id_dict[x][i])
+        print("\nProcessed Context: ", " ".join(self.processed_context[x]))
+
+
+    def better_than_average_rank(self, x):
+        pass
+
+
+
+
+
 
     def precision_at_k(self, r, k):
         """Score is precision @ k (This we solve for you!)
@@ -39,14 +102,12 @@ class Eval():
 
     def precision_at_top_k(self, query, docs, k):
         """Score is precision @ top k"""
-            
-        
-        
-        
+       
         # Compute precision top k
-        precision_top_k = len(list_detected_fraudulent_transactions) / top_k
+        # precision_top_k = len(list_detected_fraudulent_transactions) / top_k
         
-        return list_detected_fraudulent_transactions, precision_top_k
+        # return list_detected_fraudulent_transactions, precision_top_k
+        pass
 
     def average_precision(self, r):
         """Score is average precision (area under PR curve)
