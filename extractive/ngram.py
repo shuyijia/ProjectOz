@@ -5,7 +5,7 @@ import math
 from datasets import load_dataset
 from ordered_set import OrderedSet
 from helpers.utils import preprocess
-
+from query_expansion.expand_query import get_expanded_query
 # used for unseen words in training vocabularies
 UNK = None
 # sentence start and end
@@ -14,20 +14,38 @@ SENTENCE_END = "</s>"
 
  
 class Ngram:
-    def __init__(self, contexts):
+    def __init__(self, bm25_index):
         self.START = '<START>'
         self.STOP = '<STOP>'
         self.unigram_dict = None
-        self.docs = preprocess(list(OrderedSet(contexts)))
+        self.index = bm25_index.index
+        self.docs = bm25_index.contexts
+        self.average_doc_len = np.mean(np.array([len(doc) for doc in self.docs]))
         
-    def query_ngrams(self, query, n):
-        query_split = query.split()
+    def expand_query_idf(self, query, top_k=2):
+        idf_query_terms = {}
+        for term in query:
+            idf_query_terms[term] = (self.get_idf(self.get_df(term)))
+        idf_query_terms = dict(sorted(idf_query_terms.items(), key=lambda item: item[1], reverse=True))
+        return get_expanded_query(query, list(idf_query_terms.keys())[:top_k])
+        
+    def get_idf(self, df_term):
+        return math.log(len(self.docs)/df_term, 10)
+    
+    def get_df(self, term):
+        return len(self.index[term]) 
+    
+    def query_ngrams(self, query, n, expand_query=False):
+        query = preprocess([query])[0]
+        if expand_query:
+            query = self.expand_query_idf(query)
+            query = preprocess([query])[0]
         if n ==1:
-            return query_split
+            return query
         elif n == 2:
-            return [query_split[i:i+2] for i in range(len(query_split)-1)]
+            return [query[i:i+2] for i in range(len(query)-1)]
         elif n == 3:
-            return [query_split[i:i+3] for i in range(len(query_split)-2)]
+            return [query[i:i+3] for i in range(len(query)-2)]
         
     def compute_ngram(self, sents, n):
 
@@ -48,7 +66,7 @@ class Ngram:
     
     def ngram_prob(self, ngram, num_words, unigram_dic, bigram_dic, trigram_dic):
         prob = None
-        print(f"ngram isss {ngram[0]}, {unigram_dic[ngram[0]]}")
+        # print(f"ngram isss {ngram[0]}, {unigram_dic[ngram[0]]}")
         if len(ngram) == 1:
             try:
                 prob = unigram_dic[ngram[0]]/num_words
@@ -121,8 +139,8 @@ class Ngram:
             raise ValueError
         return s_prob
     
-    def rank_docs(self, query, alpha=None, top_k = 0):
-        query_parsed = self.query_ngrams(query, 2)
+    def rank_docs(self, query, alpha=None, top_k = 0, expand_query=False):
+        query_parsed = self.query_ngrams(query, 2, expand_query=expand_query)
         prob_dict = {}
         for id, context in enumerate(self.docs):
             unigram_set, unigram_dict = self.compute_ngram([context], 1)

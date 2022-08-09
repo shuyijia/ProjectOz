@@ -56,8 +56,9 @@ if __name__ == "__main__":
     # NGRAM
     dataset = load_dataset("squad_v2")
     valid = dataset['train']
-    ngram = Ngram(valid['context'])
-    ngram_scores, ngram_contexts = ngram.rank_docs("in what country is normandy located", alpha=5, top_k=10)
+    bm25_index = BM25Index(valid)
+    ngram = Ngram(bm25_index)
+    ngram_scores, ngram_contexts = ngram.rank_docs("fuck you when", alpha=None, top_k=10, expand_query=True)
 
     # main idea: Get the top K docs, fetch the docs's query tagging
     # if tagging exist for the doc then yes
