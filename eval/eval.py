@@ -28,7 +28,7 @@ class Eval():
             doc = each['context']
             doc_id = self.processed_context.index(preprocess([doc])[0])
             tic = time.time()
-            allvsm, tagged_sorted_dict = self.vsm.vsm(q, vsm_method = "cosine_similarity", print_top_k=10)
+            allvsm, tagged_sorted_dict = self.vsm.vsm(q, vsm_method = "jaccard_similarity", print_top_k=10)
             toc = time.time()
             print((toc-tic) /1000)
             ranks.append(list(tagged_sorted_dict.keys()).index(doc_id))
