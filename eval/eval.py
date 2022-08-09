@@ -8,6 +8,7 @@ from prettyprinter import pprint
 from extractive.vsm import VSM
 from helpers.utils import *
 import time
+from tqdm import tqdm
 
 class Eval():
     def __init__(self, dataset, processed_context, vsm):
@@ -23,17 +24,12 @@ class Eval():
                 val => query
         '''
         ranks = []
-        for i, each in enumerate(self.dataset):
+        for i, each in tqdm(enumerate(self.dataset)):
             q = each['question']
             doc = each['context']
             doc_id = self.processed_context.index(preprocess([doc])[0])
-            tic = time.time()
-            allvsm, tagged_sorted_dict = self.vsm.vsm(q, vsm_method = "cosine_similarity", print_top_k=10)
-            toc = time.time()
-            print((toc-tic) /1000)
+            allvsm, tagged_sorted_dict = self.vsm.vsm(q, vsm_method = "jaccard_similarity", print_top_k=10)
             ranks.append(list(tagged_sorted_dict.keys()).index(doc_id))
-            if i % 100 == 0:
-                print(i)
         print("Done", np.mean(ranks))
         return np.mean(ranks)
 
