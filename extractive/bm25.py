@@ -48,7 +48,7 @@ class BM25:
         for doc_id in tqdm(range(len(self.docs))):
             bm25_scores[doc_id] = self.score_doc(query,doc_id, k1, b)
         bm25_scores_sorted =  dict(sorted(bm25_scores.items(), key=lambda item: item[1], reverse=True))
-        bm25_scores_sorted = dict(list(bm25_scores_sorted.items())[: top_k])
+        bm25_scores_sorted_top_k = dict(list(bm25_scores_sorted.items())[: top_k])
         print_doc_count = 0
         doc_contexts = []
         for doc_id in bm25_scores_sorted:
@@ -57,6 +57,6 @@ class BM25:
             print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {bm25_scores_sorted[doc_id]} \n\nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])}", end=f"\n\n{'*'*175}\n\n")
             doc_contexts.append(' '.join(self.docs[doc_id]))
             print_doc_count += 1
-        return bm25_scores_sorted, doc_contexts
+        return bm25_scores_sorted_top_k, doc_contexts
             
     

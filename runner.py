@@ -56,13 +56,10 @@ if __name__ == "__main__":
     # NGRAM
     dataset = load_dataset("squad_v2")
     valid = dataset['train']
-    data_preprocessed = preprocess(list(OrderedSet(valid['context'])))
-    # print(len(data_preprocessed))
-    # ngram = Ngram()
-    # print(ngram.rank_docs("hi how are you", data_preprocessed))
-    print(valid)
+    ngram = Ngram(valid['context'])
+    ngram_scores, ngram_contexts = ngram.rank_docs("in what country is normandy located", alpha=5, top_k=10)
 
     # main idea: Get the top K docs, fetch the docs's query tagging
     # if tagging exist for the doc then yes
-    eval = Eval()
-    eval.precision_at_top_k()
+    # eval = Eval()
+    # eval.precision_at_top_k()
