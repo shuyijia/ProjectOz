@@ -70,5 +70,14 @@ if __name__ == "__main__":
     
     # main idea: Get the top K docs, fetch the docs's query tagging
     # if tagging exist for the doc then yes
-    
-    
+ 
+    dataset = load_dataset("squad_v2")
+    valid = dataset['train']
+    bm25_index = BM25Index(valid)
+    ngram = Ngram(bm25_index)
+    ngram_scores, ngram_contexts = ngram.rank_docs("duck you when", 3, alpha=None, top_k=10, expand_query=True, verbose=False)
+
+    # main idea: Get the top K docs, fetch the docs's query tagging
+    # if tagging exist for the doc then yes
+    # eval = Eval()
+    # eval.precision_at_top_k()
