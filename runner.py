@@ -12,10 +12,6 @@ from prettyprinter import pprint
 if __name__ == "__main__":
     
     # # BM25
-    # dataset = load_dataset("squad_v2")
-    # valid = dataset['train']
-    # bm25_index = BM25Index(valid)
-    # bm25 = BM25(bm25_index)
     dataset = load_dataset("squad_v2")
     valid = dataset['validation']
     bm25_index = BM25Index(valid)
@@ -23,6 +19,7 @@ if __name__ == "__main__":
     # query = "In what country is Normandy located"
     # bm25_scores, doc_contexts = bm25.score_docs(query, top_k=3, expand_query=False)
     # print(bm25_scores)
+    
     # VSM
     # dataset = load_dataset("squad_v2")
     # valid = dataset['train']
