@@ -26,14 +26,6 @@ class VSM:
         self.vsm_method = vsm_method
         doc_index = 0
 
-        # print("Original Context: ", self.original_context[0])
-        # print("Context: ", ' '.join(self.docs[0]))
-        # for i in range(5):
-        #     print("Original Context: ", self.original_context[i], "\n")
-        #     print("Context: ", ' '.join(self.docs[0]), '/n')
-        #     print("Questions: ", self.questions[i], '/n')
-
-
         self.tagged_questions = {}
         
 
@@ -42,6 +34,7 @@ class VSM:
             for doc in self.all_docs_vec:
                 a = self.vectorized_query
                 b = doc.reshape(1, doc.shape[0])
+                print(a.shape,b)
                 all_vsm[doc_index] = cosine_similarity(a, b)[0][0]
                 doc_index += 1
             vsm_scores_sorted = self.score_docs(all_vsm, print_top_k)

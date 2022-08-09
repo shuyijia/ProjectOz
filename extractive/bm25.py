@@ -32,20 +32,23 @@ class BM25:
         return score
     
     def expand_query_idf(self, query, top_k=2):
+        # print(query)
         idf_query_terms = {}
         for term in query:
+            if term not in self.index:
+                 continue 
             idf_query_terms[term] = (self.get_idf(self.get_df(term)))
         idf_query_terms = dict(sorted(idf_query_terms.items(), key=lambda item: item[1], reverse=True))
         return get_expanded_query(query, list(idf_query_terms.keys())[:top_k])
     
-    def score_docs(self, query, k1=1.5, b=0.75, top_k=0, expand_query=True):
+    def score_docs(self, query, k1=1.5, b=0.75, top_k=0, expand_query=True, verbose=False):
         query = preprocess([query])[0]
         if expand_query:
             query = self.expand_query_idf(query)
             query = preprocess([query])[0]
-        print("Final query:",query)
+        # print("Final query:",query)
         bm25_scores = {}
-        for doc_id in tqdm(range(len(self.docs))):
+        for doc_id in (range(len(self.docs))):
             bm25_scores[doc_id] = self.score_doc(query,doc_id, k1, b)
         bm25_scores_sorted =  dict(sorted(bm25_scores.items(), key=lambda item: item[1], reverse=True))
         bm25_scores_sorted_top_k = dict(list(bm25_scores_sorted.items())[: top_k])
@@ -54,7 +57,8 @@ class BM25:
         for doc_id in bm25_scores_sorted:
             if print_doc_count == top_k:
                 break
-            print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {bm25_scores_sorted[doc_id]} \n\nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])}", end=f"\n\n{'*'*175}\n\n")
+            if verbose:
+                print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {bm25_scores_sorted[doc_id]} \n\nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])}", end=f"\n\n{'*'*175}\n\n")
             doc_contexts.append(' '.join(self.docs[doc_id]))
             print_doc_count += 1
         return bm25_scores_sorted_top_k, doc_contexts

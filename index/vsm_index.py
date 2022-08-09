@@ -50,7 +50,7 @@ class VSMIndex:
         '''
         if self.method == 'doc2vec':
             doc = doc.split(' ')
-            return self.model.infer_vector(doc, steps=20, alpha=0.025)
+            return self.model.infer_vector(doc, epochs=20, alpha=0.025)
         elif self.method == 'tfidf':
             sparse = self.model.transform([doc])
             return self.svd.transform(sparse)
