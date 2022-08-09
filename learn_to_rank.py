@@ -1,10 +1,20 @@
 import pandas as pd 
 import torch
 import random
+from datasets import load_dataset
+from extractive.bm25 import BM25
+from extractive.vsm import VSM
+from index.bm25_index import BM25Index
+from index.vsm_index import VSMIndex
+from torch.utils.data import Dataset, DataLoader
+import numpy as np
+from sklearn.model_selection import train_test_split
+import torchtext
+from torchtext.data.utils import get_tokenizer
+from collections import Counter
 
 #find gpu otherwise use cpu
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
 
 '''
 load and split the data
@@ -18,8 +28,6 @@ rel_docs = data['response'].values.tolist()
 data = [(queries[i], rel_docs[i]) for i in range(len(queries))]
 
 #Train-Test split
-import numpy as np
-from sklearn.model_selection import train_test_split
 
 train_dataset, test_dataset = train_test_split(
     data, test_size=1/10, random_state=179)
@@ -30,9 +38,7 @@ train_dataset, valid_dataset = train_test_split(
 '''
 Tokenization
 '''
-import torchtext
-from torchtext.data.utils import get_tokenizer
-from collections import Counter
+
 
 # tokenizer type
 tokenizer = get_tokenizer("basic_english")
@@ -52,7 +58,7 @@ print("\nVocab size:",len(vocab))
 '''
 Dataloader
 '''
-from torch.utils.data import Dataset, DataLoader
+
 
 #defined maximum query and doc length
 max_doc_len = 50
@@ -126,7 +132,6 @@ class Ranking_model(nn.Module):
                                       embedding_dim=50, 
                                       padding_idx=vocab.stoi['<pad>'])
 
-        #Exercise:1
         #define the LSTM encoder here.
         self.encoder = nn.LSTM(input_size=50, hidden_size=50, batch_first=True)
 
@@ -140,7 +145,6 @@ class Ranking_model(nn.Module):
         pos_doc_embedded = self.embedding(pos_doc_tokens)
         neg_doc_embedded = self.embedding(neg_doc_tokens)
 
-        #Exercise:2
         #pass the query, positive, and negative document through the encoder
         out_qry, _ = self.encoder(qry_embedded)
         out_pos, _ = self.encoder(pos_doc_embedded)
@@ -150,13 +154,10 @@ class Ranking_model(nn.Module):
         out_pos = torch.mean(out_pos, dim=1)
         out_neg = torch.mean(out_neg, dim=1)
 
-
-        #Exercise:3
         #concat query-positive document and query-negative document
         concat_q_pos_doc = torch.cat((out_pos, out_qry), dim=1)
         concat_q_neg_doc = torch.cat((out_neg, out_qry), dim=1)
 
-        #Exercise:4
         #feedforward layer inplace of question marks
         pos_score = torch.relu(self.nn_layer1(concat_q_pos_doc))
         neg_score = torch.relu(self.nn_layer1(concat_q_neg_doc))
@@ -165,11 +166,9 @@ class Ranking_model(nn.Module):
 
         return diff
 
-
 # Construct our model by instantiating the model class defined above
 model = Ranking_model()
 model.to(device) #put it on the device
-
 
 '''
 Download glove
@@ -192,7 +191,6 @@ for word in vocab.stoi.keys():
     if word in glove_50dim.key_to_index.keys():
         word_vec = glove_50dim[word]
         model.embedding.weight.data[vocab.stoi[word]] = torch.tensor(word_vec)
-
 
 #function to score documents based on a query
 #  to be used for a trained model
@@ -262,3 +260,38 @@ for epoch in range(num_epochs):
         doc3 = "singapore has decent climate"
 
         rank_docs(qry, [doc1, doc2, doc3])
+
+if __name__ == "__main__":
+
+     # BM25
+    dataset = load_dataset("squad_v2")
+    valid = dataset['train']
+    bm25_index = BM25Index(valid)
+    bm25 = BM25(bm25_index)
+    query = "In what country is Normandy located"
+    bm25_scores, doc_contexts = bm25.score_docs(query, top_k=1, expand_query=False)
+    # print(bm25_scores)
+    # VSM
+    # dataset = load_dataset("squad_v2")
+    # valid = dataset['validation']
+    # method = 'tfidf'
+    # vsm_index = VSMIndex(method, valid)
+
+    # # convert a query to vectorized form
+    # query = 'In what country is Normandy located'
+    # vectorized_query = vsm_index.infer(query)
+
+    # vsm = VSM(vsm_index)
+    # # vsm.vsm(query, vsm_method="cosine_similarity", print_top_k=3)
+    # vsm.vsm(query, vsm_method="jaccard_similarity", print_top_k=3)
+
+    method = 'tfidf'
+    vsm_index = VSMIndex(method, valid)
+
+    # convert a query to vectorized form
+    query = 'what is phonology'
+    vectorized_query = vsm_index.infer(query)
+
+    vsm = VSM(vsm_index)
+    vsm.vsm(query, vsm_method="cosine_similarity", print_top_k=10)
+    # vsm.vsm(query, vsm_method="jaccard_similarity", print_top_k=10)
