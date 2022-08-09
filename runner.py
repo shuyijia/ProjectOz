@@ -12,10 +12,10 @@ from prettyprinter import pprint
 if __name__ == "__main__":
     
     # # BM25
-    dataset = load_dataset("squad_v2")
-    valid = dataset['validation']
-    bm25_index = BM25Index(valid)
-    bm25 = BM25(bm25_index)
+    # dataset = load_dataset("squad_v2")
+    # valid = dataset['validation']
+    # bm25_index = BM25Index(valid)
+    # bm25 = BM25(bm25_index)
     # query = "In what country is Normandy located"
     # bm25_scores, doc_contexts = bm25.score_docs(query, top_k=3, expand_query=False)
     # print(bm25_scores)
@@ -39,9 +39,6 @@ if __name__ == "__main__":
     # allvsm, tagged_sorted_dict = vsm.vsm(query, vsm_method="cosine_similarity", print_top_k=3)
     # vsm.vsm(query, vsm_method="jaccard_similarity", print_top_k=3)
     # pprint(tagged_sorted_dict)
-
-    eval = Eval(valid, bm25_index.contexts, bm25=bm25)
-    print(eval.average_rank(top_k=len(bm25_index.contexts), expand_query=True, verbose=False))
     
     # method = 'tfidf'
     # vsm_index = VSMIndex(method, valid)
@@ -66,13 +63,28 @@ if __name__ == "__main__":
     # main idea: Get the top K docs, fetch the docs's query tagging
     # if tagging exist for the doc then yes
  
-    # dataset = load_dataset("squad_v2")
-    # valid = dataset['train']
-    # bm25_index = BM25Index(valid)
-    # ngram = Ngram(bm25_index)
 
-    # ngram_scores, ngram_contexts = ngram.rank_docs("duck you when", 3, alpha=None, top_k=10, expand_query=True, verbose=False)
-
+    dataset = load_dataset("squad_v2")
+    valid = dataset['train']
+    bm25_index = BM25Index(valid)
+    ngram = Ngram(bm25_index)
+    
+    unigram_list = []
+    bigram_list= []
+    trigram_list = []
+    
+    for id, context in enumerate(bm25_index.contexts):
+        unigram_set, unigram_dict = ngram.compute_ngram([context], 1)
+        
+        bigram_set, bigram_dict = ngram.compute_ngram([context], 2)
+        
+        trigram_set, trigram_dict = ngram.compute_ngram([context], 3)
+        unigram_list.append(unigram_dict)
+        trigram_list.append(trigram_dict)
+        bigram_list.append(bigram_dict)
+    # ngram_scores, ngram_contexts = ngram.score_docs("duck you when", 3, alpha=None, top_k=10, expand_query=True, verbose=False)
+    eval = Eval(valid, bm25_index.contexts, language_model=ngram)
+    print(eval.average_rank(top_k=len(bm25_index.contexts), expand_query=False, verbose=False, k_arg=2, alpha=[0.45,0.45,0.1], uni_dict_list=unigram_list, bi_dict_list=bigram_list, tri_dict_list=trigram_list))
 
     # main idea: Get the top K docs, fetch the docs's query tagging
     # if tagging exist for the doc then yes
