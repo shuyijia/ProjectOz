@@ -139,13 +139,16 @@ class Ngram:
             raise ValueError
         return s_prob
     
-    def score_docs(self, query, k, alpha=None, top_k = 0, expand_query=False, verbose=False):
+    def score_docs(self, query, k, alpha=None, top_k = 0, expand_query=False, verbose=False, unigram_dict=None, bigram_dict = None, trigram_dict=None):
         query_parsed = self.query_ngrams(query, k, expand_query=expand_query)
         prob_dict = {}
         for id, context in enumerate(self.docs):
-            unigram_set, unigram_dict = self.compute_ngram([context], 1)
-            bigram_set, bigram_dict = self.compute_ngram([context], 2)
-            trigram_set, trigram_dict = self.compute_ngram([context], 3)
+            if not unigram_dict:
+                unigram_set, unigram_dict = self.compute_ngram([context], 1)
+            if not bigram_dict:
+                bigram_set, bigram_dict = self.compute_ngram([context], 2)
+            if not trigram_dict:
+                trigram_set, trigram_dict = self.compute_ngram([context], 3)
             num_words = sum([v for _,v in unigram_dict.items()])
             prob = 1
             for ngram in query_parsed:
