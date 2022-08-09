@@ -1,11 +1,12 @@
 import numpy as np
 from helpers.utils import preprocess, punctuation_removal
 from datasets import load_dataset
+from ordered_set import OrderedSet
 
 class BM25Index:
     def __init__(self, dataset) -> None:
         self.dataset = dataset
-        self.contexts = preprocess(list(set(self.dataset['context'])))
+        self.contexts = preprocess(list(OrderedSet(self.dataset['context'])))
 
         self.build()
 

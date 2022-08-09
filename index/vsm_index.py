@@ -4,7 +4,7 @@ from helpers.utils import *
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
-# from ordered_set import OrderedSet
+from ordered_set import OrderedSet
 
 class VSMIndex:
     def __init__(self, method, dataset, vector_size=40):
@@ -12,7 +12,7 @@ class VSMIndex:
         self.dataset = dataset
         self.vector_size = vector_size
         self.original_contexts = self.dataset['context']
-        self.contexts = preprocess(list(set(self.dataset['context'])))
+        self.contexts = preprocess(list(OrderedSet(self.dataset['context'])))
         self.questions = self.dataset['question']
         self.id = self.dataset['id']
 
