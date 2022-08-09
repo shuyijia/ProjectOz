@@ -139,7 +139,7 @@ class Ngram:
             raise ValueError
         return s_prob
     
-    def rank_docs(self, query, k, alpha=None, top_k = 0, expand_query=False):
+    def rank_docs(self, query, k, alpha=None, top_k = 0, expand_query=False, verbose=False):
         query_parsed = self.query_ngrams(query, k, expand_query=expand_query)
         prob_dict = {}
         for id, context in enumerate(self.docs):
@@ -162,7 +162,8 @@ class Ngram:
         print_doc_count = 0
         doc_contexts = []
         for doc_id in prob_dict_sorted_top_k:
-            print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {prob_dict_sorted[doc_id]} \n\nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])}", end=f"\n\n{'*'*175}\n\n")
+            if verbose:
+                print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {prob_dict_sorted[doc_id]} \n\nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])}", end=f"\n\n{'*'*175}\n\n")
             doc_contexts.append(' '.join(self.docs[doc_id]))
             print_doc_count += 1
         return prob_dict_sorted_top_k, doc_contexts
