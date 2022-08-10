@@ -25,6 +25,8 @@ class Ngram:
     def expand_query_idf(self, query, top_k=2):
         idf_query_terms = {}
         for term in query:
+            if term not in self.index:
+                 continue 
             idf_query_terms[term] = (self.get_idf(self.get_df(term)))
         idf_query_terms = dict(sorted(idf_query_terms.items(), key=lambda item: item[1], reverse=True))
         return get_expanded_query(query, list(idf_query_terms.keys())[:top_k])
@@ -126,13 +128,13 @@ class Ngram:
                     tri_pro = 0
                     bi_pro = (bigram_dic[(ngram[1], ngram[2])])/(unigram_dic[ngram[1]])
                 except ZeroDivisionError:
-                    s_prob = 1/len(unigram_dic)
+                    bi_pro = 1/len(unigram_dic)
             else:
                 try:
                     tri_pro = (trigram_dic[(ngram[0], ngram[1], ngram[2])])/(bigram_dic[(ngram[0], ngram[1])])
                     bi_pro = (bigram_dic[(ngram[1], ngram[2])])/(unigram_dic[ngram[1]])
                 except ZeroDivisionError:
-                    s_prob = 1/len(unigram_dic)
+                    tri_pro = bi_pro = 1/len(unigram_dic)
                     
             s_prob = lam[0]*tri_pro + lam[1]*bi_pro + lam[2]*unigram_dic[ngram[2]]/num_words
         else:
@@ -142,23 +144,51 @@ class Ngram:
     def score_docs(self, query, k, alpha=None, top_k = 0, expand_query=False, verbose=False, unigram_dict=None, bigram_dict = None, trigram_dict=None):
         query_parsed = self.query_ngrams(query, k, expand_query=expand_query)
         prob_dict = {}
-        for id, context in enumerate(self.docs):
-            if not unigram_dict:
-                unigram_set, unigram_dict = self.compute_ngram([context], 1)
-            if not bigram_dict:
-                bigram_set, bigram_dict = self.compute_ngram([context], 2)
-            if not trigram_dict:
-                trigram_set, trigram_dict = self.compute_ngram([context], 3)
-            num_words = sum([v for _,v in unigram_dict.items()])
-            prob = 1
-            for ngram in query_parsed:
-                if alpha is None:
-                    prob *= self.ngram_prob(ngram, num_words,unigram_dict, bigram_dict, trigram_dict)
-                elif type(alpha) == int:
-                    prob *= self.add_k_smoothing_ngram(ngram, alpha, num_words,unigram_dict, bigram_dict, trigram_dict)
-                elif type(alpha) == list:
-                    prob *= self.interpolation_ngram(ngram, alpha, num_words,unigram_dict, bigram_dict, trigram_dict)
-            prob_dict[id] = prob
+        u_passed = b_passed = t_passed = False
+        if unigram_dict: u_passed=True
+        if trigram_dict: t_passed=True
+        if bigram_dict: b_passed=True
+        
+        if u_passed and b_passed and t_passed:
+            for id, context in enumerate(self.docs):
+                # print(unigram_dict)
+                # print("=============================================================================================\n\n")
+                num_words = sum([v for _,v in unigram_dict[id].items()])
+                prob = 1
+                for ngram in query_parsed:
+                    if alpha is None:
+                        # print("Singular")
+                        prob *= self.ngram_prob(ngram, num_words,unigram_dict[id], bigram_dict[id], trigram_dict[id])
+                    elif type(alpha) == int:
+                        # print("Smoothing")
+                        prob *= self.add_k_smoothing_ngram(ngram, alpha, num_words,unigram_dict[id], bigram_dict[id], trigram_dict[id])
+                    elif type(alpha) == list:
+                        # print("Interpolation")
+                        prob *= self.interpolation_ngram(ngram, alpha, num_words,unigram_dict[id], bigram_dict[id], trigram_dict[id])
+                prob_dict[id] = prob
+        else:
+            for id, context in enumerate(self.docs):
+                if not u_passed:
+                    unigram_set, unigram_dict = self.compute_ngram([context], 1)
+                if not b_passed:
+                    bigram_set, bigram_dict = self.compute_ngram([context], 2)
+                if not t_passed:
+                    trigram_set, trigram_dict = self.compute_ngram([context], 3)
+                # print(unigram_dict)
+                # print("=============================================================================================\n\n")
+                num_words = sum([v for _,v in unigram_dict.items()])
+                prob = 1
+                for ngram in query_parsed:
+                    if alpha is None:
+                        # print("Singular")
+                        prob *= self.ngram_prob(ngram, num_words,unigram_dict, bigram_dict, trigram_dict)
+                    elif type(alpha) == int:
+                        # print("Smoothing")
+                        prob *= self.add_k_smoothing_ngram(ngram, alpha, num_words,unigram_dict, bigram_dict, trigram_dict)
+                    elif type(alpha) == list:
+                        # print("Interpolation")
+                        prob *= self.interpolation_ngram(ngram, alpha, num_words,unigram_dict, bigram_dict, trigram_dict)
+                prob_dict[id] = prob
         prob_dict_sorted = dict(sorted(prob_dict.items(), key=lambda item: item[1], reverse=True))
         prob_dict_sorted_top_k = dict(list(prob_dict_sorted.items())[: top_k])
         print_doc_count = 0

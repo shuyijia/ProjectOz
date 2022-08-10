@@ -36,7 +36,7 @@ class Eval():
             elif self.bm25:
                 tagged_sorted_dict, _ = self.bm25.score_docs(q, top_k=top_k, expand_query=expand_query, verbose=verbose)
             elif self.language_model:
-                tagged_sorted_dict, _ = self.language_model.score_docs(q, k=k_arg, alpha=alpha, top_k = top_k, expand_query=expand_query, verbose=verbose, unigram_dict=uni_dict_list[doc_id], bigram_dict=bi_dict_list[doc_id], trigram_dict=tri_dict_list[doc_id])
+                tagged_sorted_dict, _ = self.language_model.score_docs(q, k=k_arg, alpha=alpha, top_k = top_k, expand_query=expand_query, verbose=verbose, unigram_dict=uni_dict_list, bigram_dict=bi_dict_list, trigram_dict=tri_dict_list)
             ranks.append(list(tagged_sorted_dict.keys()).index(doc_id))
             
             if i%1000 == 0:
