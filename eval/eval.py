@@ -41,5 +41,8 @@ class Eval():
                 tagged_sorted_dict, _ = self.language_model.score_docs(q, k=k_arg, alpha=alpha, top_k = top_k, expand_query=expand_query, verbose=verbose, unigram_dict=uni_dict_list[doc_id], bigram_dict=bi_dict_list[doc_id], trigram_dict=tri_dict_list[doc_id])
 
             ranks.append(list(tagged_sorted_dict.keys()).index(doc_id))
+            
+            if i%1000 == 0:
+                print(f"i: {i} Mean so far:{np.mean(ranks)}")
         print("Done", np.mean(ranks))
         return np.mean(ranks)
