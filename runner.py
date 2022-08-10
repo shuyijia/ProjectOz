@@ -64,7 +64,7 @@ if __name__ == "__main__":
     # if tagging exist for the doc then yes
  
     dataset = load_dataset("squad_v2")
-    valid = dataset['train']
+    valid = dataset['validation']
     bm25_index = BM25Index(valid)
     ngram = Ngram(bm25_index)
     
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         bigram_list.append(bigram_dict)
     # ngram_scores, ngram_contexts = ngram.score_docs("duck you when", 3, alpha=None, top_k=10, expand_query=True, verbose=False)
     eval = Eval(valid, bm25_index.contexts, language_model=ngram)
-    print(eval.average_rank(top_k=len(bm25_index.contexts), expand_query=False, verbose=False, k_arg=2, alpha=[0.45,0.45,0.1], uni_dict_list=unigram_list, bi_dict_list=bigram_list, tri_dict_list=trigram_list))
+    print(eval.average_rank(top_k=len(bm25_index.contexts), expand_query=False, verbose=False, k_arg=1, alpha=2, uni_dict_list=unigram_list, bi_dict_list=bigram_list, tri_dict_list=trigram_list))
     # main idea: Get the top K docs, fetch the docs's query tagging
     # if tagging exist for the doc then yes
     # eval = Eval()

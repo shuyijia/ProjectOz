@@ -41,7 +41,7 @@ class Ngram:
             query = self.expand_query_idf(query)
             query = preprocess([query])[0]
         if n ==1:
-            return query
+            return [(q, ) for q in query]
         elif n == 2:
             return [query[i:i+2] for i in range(len(query)-1)]
         elif n == 3:
@@ -152,7 +152,6 @@ class Ngram:
             num_words = sum([v for _,v in unigram_dict.items()])
             prob = 1
             for ngram in query_parsed:
-                # print(ngram, unigram_dict)
                 if alpha is None:
                     prob *= self.ngram_prob(ngram, num_words,unigram_dict, bigram_dict, trigram_dict)
                 elif type(alpha) == int:
