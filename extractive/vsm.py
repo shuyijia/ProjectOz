@@ -37,8 +37,9 @@ class VSM:
                 print(a.shape,b)
                 all_vsm[doc_index] = cosine_similarity(a, b)[0][0]
                 doc_index += 1
-            vsm_scores_sorted = self.score_docs(all_vsm, print_top_k)
-            return all_vsm, self.tagged_sorted_dict
+            vsm_scores_sorted, context_sorted = self.score_docs(all_vsm, print_top_k)
+            # return all_vsm, self.tagged_sorted_dict
+            return self.tagged_sorted_dict, context_sorted
         elif vsm_method == "jaccard_similarity":
             all_vsm = {}
             self.tagged_questions = {}
@@ -52,8 +53,9 @@ class VSM:
                 self.tagged_questions[doc] = self.questions[doc]
                 self.tagged_answers[doc] = self.original_context[doc]
 
-            vsm_scores_sorted = self.score_docs(all_vsm, print_top_k)
-            return all_vsm, self.tagged_sorted_dict
+            vsm_scores_sorted, context_sorted= self.score_docs(all_vsm, print_top_k)
+            #return all_vsm, self.tagged_sorted_dict
+            return self.tagged_sorted_dict, context_sorted
         else:
             print("Method doesn't exist!")
             return None
@@ -63,17 +65,19 @@ class VSM:
         vsm_scores_sorted =  dict(sorted(all_vsm.items(), key=lambda item: item[1], reverse=True))
         print_doc_count = 0
         self.tagged_sorted_dict = {}
+        context_sorted = []
 
         #print("VSM Method: ", self.vsm_method)
         for doc_id in vsm_scores_sorted:
             # if print_doc_count == print_top_k:
             #     break
             # print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {vsm_scores_sorted[doc_id]} \nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])} \n", end=f"\n\n{'*'*175}\n")
-            self.tagged_sorted_dict[doc_id] = ' '.join(self.docs[doc_id])
+            self.tagged_sorted_dict[doc_id] = vsm_scores_sorted[doc_id]
+            context_sorted.append(' '.join(self.docs[doc_id]))
 
             print_doc_count += 1
         #print("\n"*5)
-        return vsm_scores_sorted
+        return vsm_scores_sorted, context_sorted
 
 if __name__ == "__main__":
     dataset = load_dataset("squad_v2")
