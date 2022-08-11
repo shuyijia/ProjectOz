@@ -17,3 +17,8 @@ vsm_index = VSMIndex(method, valid)
 
 vsm = VSM(vsm_index)
 eval = Eval(valid, vsm_index.contexts, vsm)
+eval.average_rank(vsm_method="cosine_similarity", k_arg=10)
+eval.average_rank(vsm_method="jaccard_similarity", k_arg=10)
+
+#################################################################
+
