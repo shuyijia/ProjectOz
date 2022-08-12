@@ -8,7 +8,7 @@ Okapi-BM25 outperformed other extractive models like vector space model and lang
 Project Oz’s end to end span extraction pipeline clearly demonstrated ability to extract exact
 answers for a given query.
 
-For more informtation about the 50.045 Information Retrieval Course, visit
+For more information about the 50.045 Information Retrieval Course, visit
 https://istd.sutd.edu.sg/undergraduate/courses/50045-information-retrieval
 
 Done by:
