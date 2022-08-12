@@ -20,14 +20,17 @@ class VSM:
         self.average_doc_len = np.mean(np.array([len(doc) for doc in self.docs]))
         self.vsm_method = "NIL"
 
-    def vsm(self, query, vsm_method = "cosine_similarity", print_top_k=0):
+    def vsm(self, query, vsm_method = "cosine_similarity", print_top_k=0, verbose=False):
         self.vectorized_query = self.vsm_index.infer(query)
         factor = 5
         self.vsm_method = vsm_method
+        self.verbose = verbose
         doc_index = 0
 
         self.tagged_questions = {}
-        
+
+        if verbose:
+            print("Similarity Function: ", vsm_method, '\n')
 
         if vsm_method == "cosine_similarity":
             all_vsm = {}
@@ -67,16 +70,15 @@ class VSM:
         self.tagged_sorted_dict = {}
         context_sorted = []
 
-        #print("VSM Method: ", self.vsm_method)
         for doc_id in vsm_scores_sorted:
-            # if print_doc_count == print_top_k:
-            #     break
-            # print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {vsm_scores_sorted[doc_id]} \nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])} \n", end=f"\n\n{'*'*175}\n")
+            if self.verbose == True:
+                if print_doc_count == print_top_k:
+                    break
+                print(f"Doc Rank: {print_doc_count +1}\nDoc score for Doc {doc_id}: {vsm_scores_sorted[doc_id]} \nWords in Doc {doc_id}: {' '.join(self.docs[doc_id])} \n", end=f"\n\n{'*'*175}\n")
             self.tagged_sorted_dict[doc_id] = vsm_scores_sorted[doc_id]
             context_sorted.append(' '.join(self.docs[doc_id]))
 
             print_doc_count += 1
-        #print("\n"*5)
         return vsm_scores_sorted, context_sorted
 
 if __name__ == "__main__":

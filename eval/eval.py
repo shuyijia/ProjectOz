@@ -33,7 +33,7 @@ class Eval():
             doc_id = self.processed_context.index(preprocess([doc])[0])
 
             if self.vsm:
-                _, tagged_sorted_dict = self.vsm.vsm(q, vsm_method = vsm_method, print_top_k=top_k)
+                tagged_sorted_dict, _ = self.vsm.vsm(q, vsm_method = vsm_method, print_top_k=top_k)
             elif self.bm25:
                 tagged_sorted_dict, _ = self.bm25.score_docs(q, top_k=top_k, expand_query=expand_query, verbose=verbose)
             elif self.language_model:
@@ -45,3 +45,5 @@ class Eval():
                 print(f"i: {i} Mean so far:{np.mean(ranks)}")
         print("Done", np.mean(ranks))
         return np.mean(ranks)
+
+
