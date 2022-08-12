@@ -31,6 +31,11 @@ from datasets import load_dataset
 datasets = load_dataset("squad_v2")
 ```
 # What have been implemented
+- Preprocessing
+  - Punctuation removal
+  - Case folding
+  - Remove white spaces
+  - Tokenization
 - Vector Space Model (VSM)
   - Vectorization Techniques:
     - TF-IDF
@@ -46,17 +51,19 @@ datasets = load_dataset("squad_v2")
 - Span Extraction using Transformer
 
 # How to run the models
-To run extractive models, use 
+To run extractive models, uncomment desired models and run 
 ```
 runner.py
 ```
 
-To evaluate extractive model, use 
+To evaluate extractive model, uncomment desired models and run
 ```
 extraction_evaluation.py
 ```
 
-To use end to end span extraction model, use
+To use end to end span extraction model, run
 ```
 end2end.py
 ```
+
+
