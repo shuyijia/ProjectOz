@@ -26,7 +26,6 @@ class Eval():
                 val => query
         '''
         ranks = []
-        # print(type(k_arg))
         for i, each in tqdm(enumerate(self.dataset)):
             q = each['question']
             doc = each['context']

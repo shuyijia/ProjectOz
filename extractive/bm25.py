@@ -32,7 +32,6 @@ class BM25:
         return score
     
     def expand_query_idf(self, query, top_k=2):
-        # print(query)
         idf_query_terms = {}
         for term in query:
             if term not in self.index:
