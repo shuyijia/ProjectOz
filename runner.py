@@ -16,8 +16,8 @@ if __name__ == "__main__":
     # valid = dataset['validation']
     # bm25_index = BM25Index(valid)
     # bm25 = BM25(bm25_index)
-    # query = "In what country is Normandy located"
-    # bm25_scores, doc_contexts = bm25.score_docs(query, top_k=3, expand_query=False)
+    # query = "What is the name of Harry Potter's owl?"
+    # bm25_scores, doc_contexts = bm25.score_docs(query, top_k=3, expand_query=True)
     # print(bm25_scores)
     
     # VSM
@@ -82,6 +82,7 @@ if __name__ == "__main__":
         unigram_list.append(unigram_dict)
         trigram_list.append(trigram_dict)
         bigram_list.append(bigram_dict)
+    print(unigram_list[35])
     # ngram_scores, ngram_contexts = ngram.score_docs("duck you when", 3, alpha=None, top_k=10, expand_query=True, verbose=False)
     # print(unigram_list[0], f" \n\n\n {unigram_list[1]}")
     eval = Eval(valid, bm25_index.contexts, language_model=ngram)

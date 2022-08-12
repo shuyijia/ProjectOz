@@ -18,19 +18,5 @@ def preprocess(l, remove_punctuation=True, fold_cases=True):
 
   return list(map(split_and_remove_spaces, l))
 
-# def preprocess(l, remove_punctuation=True, fold_cases=True):
-#   if remove_punctuation:
-#     l = map(punctuation_removal, l)
-#   if fold_cases:
-#     l = map(case_folding, l)
-
-#   # out = []
-#   # for i in l:
-#   #   out.append(split_and_remove_spaces(i))
-
-#   # print("PREPROICESDSEDEDED")
-#   # print(out[:3])
-#   # print("asdasdfsdf")
-#   #print(list(map(split_and_remove_spaces, l))[:7])
-
-#   return list(map(split_and_remove_spaces, l))
+if __name__ == "__main__":
+  print(preprocess([" What is the name of Harry Potter's owl?"]))
