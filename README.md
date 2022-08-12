@@ -10,6 +10,9 @@ Done by:
 - [Jia Shuyi](https://github.com/shuyijia)
 - [Pheh Jing Jie](https://github.com/jjbecomespheh)
 
+# Overview framework
+![overall_framework](https://user-images.githubusercontent.com/50895766/184366226-b675c8dd-743a-487b-ab34-60cd34769bcc.png)
+
 # Getting Started
 ```
 pip install -r requirements.txt
