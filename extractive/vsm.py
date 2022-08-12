@@ -41,7 +41,6 @@ class VSM:
                 all_vsm[doc_index] = cosine_similarity(a, b)[0][0]
                 doc_index += 1
             vsm_scores_sorted, context_sorted = self.score_docs(all_vsm, print_top_k)
-            # return all_vsm, self.tagged_sorted_dict
             return self.tagged_sorted_dict, context_sorted
         elif vsm_method == "jaccard_similarity":
             all_vsm = {}

@@ -47,9 +47,8 @@ if __name__ == "__main__":
     bm25_index = BM25Index(valid)
 
     data_preprocessed = preprocess(list(OrderedSet(valid['context'])))
-    print(len(data_preprocessed))
     ngram = Ngram(bm25_index)
-    print(ngram.score_docs("hi how are you", data_preprocessed, verbose=verbose, expand_query=False))
+    print(ngram.score_docs("What machine's branching does not exactly capture many of the mathematical models we want to analyze?", 2, alpha=[0.5,0.5,0.1], verbose=verbose, expand_query=False))
     #############################################################################################
     
 

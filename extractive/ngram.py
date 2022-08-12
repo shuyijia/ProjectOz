@@ -68,7 +68,6 @@ class Ngram:
     
     def ngram_prob(self, ngram, num_words, unigram_dic, bigram_dic, trigram_dic):
         prob = None
-        # print(f"ngram isss {ngram[0]}, {unigram_dic[ngram[0]]}")
         if len(ngram) == 1:
             try:
                 prob = unigram_dic[ngram[0]]/num_words
@@ -151,19 +150,14 @@ class Ngram:
         
         if u_passed and b_passed and t_passed:
             for id, context in enumerate(self.docs):
-                # print(unigram_dict)
-                # print("=============================================================================================\n\n")
                 num_words = sum([v for _,v in unigram_dict[id].items()])
                 prob = 1
                 for ngram in query_parsed:
                     if alpha is None:
-                        # print("Singular")
                         prob *= self.ngram_prob(ngram, num_words,unigram_dict[id], bigram_dict[id], trigram_dict[id])
                     elif type(alpha) == int:
-                        # print("Smoothing")
                         prob *= self.add_k_smoothing_ngram(ngram, alpha, num_words,unigram_dict[id], bigram_dict[id], trigram_dict[id])
                     elif type(alpha) == list:
-                        # print("Interpolation")
                         prob *= self.interpolation_ngram(ngram, alpha, num_words,unigram_dict[id], bigram_dict[id], trigram_dict[id])
                 prob_dict[id] = prob
         else:
@@ -174,19 +168,14 @@ class Ngram:
                     bigram_set, bigram_dict = self.compute_ngram([context], 2)
                 if not t_passed:
                     trigram_set, trigram_dict = self.compute_ngram([context], 3)
-                # print(unigram_dict)
-                # print("=============================================================================================\n\n")
                 num_words = sum([v for _,v in unigram_dict.items()])
                 prob = 1
                 for ngram in query_parsed:
                     if alpha is None:
-                        # print("Singular")
                         prob *= self.ngram_prob(ngram, num_words,unigram_dict, bigram_dict, trigram_dict)
                     elif type(alpha) == int:
-                        # print("Smoothing")
                         prob *= self.add_k_smoothing_ngram(ngram, alpha, num_words,unigram_dict, bigram_dict, trigram_dict)
                     elif type(alpha) == list:
-                        # print("Interpolation")
                         prob *= self.interpolation_ngram(ngram, alpha, num_words,unigram_dict, bigram_dict, trigram_dict)
                 prob_dict[id] = prob
         prob_dict_sorted = dict(sorted(prob_dict.items(), key=lambda item: item[1], reverse=True))

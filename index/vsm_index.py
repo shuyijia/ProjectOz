@@ -65,11 +65,7 @@ if __name__ == '__main__':
 
     # get all vectorzied documents
     all_docs = idx.doc_vecs
-    print(type(all_docs))
-    print(all_docs.shape)
-    print(all_docs)
 
     # convert a query to vectorized form
     query = 'what is the name of the last French king'
     vectorized_query = idx.infer(query)
-    print(vectorized_query.shape)

@@ -45,21 +45,21 @@ valid = dataset['validation']
 # main idea: Get the top K docs, fetch the docs's query tagging
 # if tagging exist for the doc then yes
 # '''
-# bm25_index = BM25Index(valid)
-# ngram = Ngram(bm25_index)
+bm25_index = BM25Index(valid)
+ngram = Ngram(bm25_index)
 
-# unigram_list = []
-# bigram_list= []
-# trigram_list = []
+unigram_list = []
+bigram_list= []
+trigram_list = []
 
-# for id, context in enumerate(bm25_index.contexts):
-#     unigram_set, unigram_dict = ngram.compute_ngram([context], 1)
-#     bigram_set, bigram_dict = ngram.compute_ngram([context], 2)
-#     trigram_set, trigram_dict = ngram.compute_ngram([context], 3)
-#     unigram_list.append(unigram_dict)
-#     trigram_list.append(trigram_dict)
-#     bigram_list.append(bigram_dict)
+for id, context in enumerate(bm25_index.contexts):
+    unigram_set, unigram_dict = ngram.compute_ngram([context], 1)
+    bigram_set, bigram_dict = ngram.compute_ngram([context], 2)
+    trigram_set, trigram_dict = ngram.compute_ngram([context], 3)
+    unigram_list.append(unigram_dict)
+    trigram_list.append(trigram_dict)
+    bigram_list.append(bigram_dict)
 
-# eval = Eval(valid, bm25_index.contexts, language_model=ngram)
-# print(eval.average_rank(top_k=len(bm25_index.contexts), expand_query=False, verbose=False, k_arg=1, alpha=2, uni_dict_list=unigram_list, bi_dict_list=bigram_list, tri_dict_list=trigram_list))
+eval = Eval(valid, bm25_index.contexts, language_model=ngram)
+print(eval.average_rank(top_k=len(bm25_index.contexts), expand_query=False, verbose=False, k_arg=1, alpha=2, uni_dict_list=unigram_list, bi_dict_list=bigram_list, tri_dict_list=trigram_list))
 #############################################################################################
