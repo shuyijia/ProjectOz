@@ -2,6 +2,12 @@
 A Question Answering Information Retrieval System
 SUTD's 50.045 Information Retrieval Module Project
 
+Project Oz aims to implement a span extraction information retrieval system for question
+answering using the Stanford Question Answering Dataset (SQuAD). Our implementation of
+Okapi-BM25 outperformed other extractive models like vector space model and language model.
+Project Oz’s end to end span extraction pipeline clearly demonstrated ability to extract exact
+answers for a given query.
+
 For more informtation about the 50.045 Information Retrieval Course, visit
 https://istd.sutd.edu.sg/undergraduate/courses/50045-information-retrieval
 
@@ -24,6 +30,21 @@ Load SQuAD dataset:
 from datasets import load_dataset
 datasets = load_dataset("squad_v2")
 ```
+# What have been implemented
+- Vector Space Model (VSM)
+  - Vectorization Techniques:
+    - TF-IDF
+    - Doc2Vec
+  - Similarity Functions:
+    - Cosine Similarity
+    - Jaccard Similarity
+- Okapi-BM25
+- Language Model
+  - n-gram Language Model
+  - Laplace Smoothing
+  - Interpolated n-gram Model
+- Span Extraction using Transformer
+
 # How to run the models
 To run extractive models, use 
 ```
